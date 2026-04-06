@@ -23,13 +23,13 @@ import {
   Logout as LogoutIcon,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { gsap } from "gsap";
 
 const drawerWidth = 280;
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,7 +70,7 @@ const Layout = ({ children }) => {
             WebkitTextFillColor: "transparent",
           }}
         >
-          ANTIGRAVITY
+          CollabSpace
         </Typography>
       </Toolbar>
       <Divider sx={{ opacity: 0.1 }} />
@@ -108,7 +108,7 @@ const Layout = ({ children }) => {
               </ListItemIcon>
               <ListItemText
                 primary={item.text}
-                primaryTypographyProps={{ fontWeight: 700, fontSize: "0.95rem" }}
+                primaryTypographyProps={{ fontWeight: 700 }}
               />
             </ListItemButton>
           </ListItem>
@@ -220,7 +220,7 @@ const Layout = ({ children }) => {
         }}
       >
         <Container maxWidth="xl" ref={contentRef}>
-          {children}
+          <Outlet />
         </Container>
       </Box>
     </Box>

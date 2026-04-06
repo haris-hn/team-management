@@ -170,7 +170,7 @@ const ProjectCard = ({ project, onEdit, onDelete, index, allMembers }) => {
             "&:hover": { bgcolor: "rgba(99, 102, 241, 0.1)" },
           }}
         >
-          Adjust Scope
+          Edit
         </Button>
       </CardActions>
     </Card>
@@ -237,6 +237,10 @@ const Projects = () => {
         members: [],
       });
     }
+    // Blur current focus to prevent ARIA hidden warnings when modal opens
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setOpen(true);
   };
 
@@ -272,11 +276,11 @@ const Projects = () => {
     <Box>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", mb: 6, mt: 2, gap: 2 }}>
         <Box>
-          <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-1.5px", mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}>
-            Project Hub
+          <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-1.5px", mb: 1 }}>
+            Project Management
           </Typography>
           <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)" }}>
-            Managing {projects.length} active workstreams
+            Overview of {projects.length} active projects
           </Typography>
         </Box>
         <Button
@@ -313,20 +317,20 @@ const Projects = () => {
         >
           <RocketLaunch sx={{ fontSize: 80, color: "primary.main", opacity: 0.3, mb: 3 }} />
           <Typography variant="h4" fontWeight={800} gutterBottom>
-            Ready for takeoff?
+            No projects found
           </Typography>
           <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)", mb: 4 }}>
-            Your workspace is currently empty. Start by defining your first high-impact project.
+            There are currently no active projects in this workspace. Create a new one to begin tracking.
           </Typography>
           <Button variant="outlined" onClick={() => handleOpen()} size="large" sx={{ borderRadius: 3, px: 4 }}>
-            Initialize Workspace
+            Create First Project
           </Button>
         </Paper>
       )}
 
       <Grid container spacing={4}>
         {projects.map((proj, idx) => (
-          <Grid item xs={12} sm={6} lg={4} xl={3} key={proj._id} sx={{ display: "flex" }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }} key={proj._id} sx={{ display: "flex" }}>
             <ProjectCard
               project={proj}
               onEdit={handleOpen}
@@ -353,12 +357,12 @@ const Projects = () => {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <DialogTitle sx={{ p: 4, pb: 2 }}>
+          <DialogTitle sx={{ p: 4, pb: 2 }} component="div">
             <Typography variant="h4" fontWeight={900} sx={{ letterSpacing: "-1px" }}>
-              {editing ? "Refine Workstream" : "New Workstream"}
+              {editing ? "Edit Project" : "New Project"}
             </Typography>
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mt: 1 }}>
-              Define the technological parameters and team alignment.
+              Configure the project parameters and team assignments.
             </Typography>
           </DialogTitle>
           <DialogContent sx={{ p: 4 }}>
@@ -395,12 +399,12 @@ const Projects = () => {
               />
 
               <FormControl fullWidth variant="filled">
-                <InputLabel sx={{ ml: 1 }}>Assign Domain Experts</InputLabel>
+                <InputLabel sx={{ ml: 1 }}>Assign Team Members</InputLabel>
                 <Select
                   multiple
                   value={formData.members}
                   onChange={(e) => setFormData({ ...formData, members: e.target.value })}
-                  input={<OutlinedInput label="Assign Domain Experts" sx={{ borderRadius: 2, bgcolor: "rgba(255,255,255,0.03)", border: "none" }} />}
+                  input={<OutlinedInput label="Assign Team Members" sx={{ borderRadius: 2, bgcolor: "rgba(255,255,255,0.03)", border: "none" }} />}
                   renderValue={(selected) => (
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                       {selected.map((value) => (
@@ -452,7 +456,7 @@ const Projects = () => {
               size="large"
               sx={{ borderRadius: 3, px: 6, fontWeight: 900, boxShadow: "0 10px 20px rgba(99, 102, 241, 0.2)" }}
             >
-              {editing ? "Save Refinements" : "Initialize Workstream"}
+              {editing ? "Save Changes" : "Create Project"}
             </Button>
           </DialogActions>
         </form>

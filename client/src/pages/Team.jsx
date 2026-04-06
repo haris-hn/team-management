@@ -15,6 +15,12 @@ import {
   Snackbar,
   Paper,
   Divider,
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+  Grid,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { Add, Delete, Edit, GroupAdd, PersonAdd } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -73,6 +79,10 @@ const Team = () => {
       setEditing(null);
       setFormData({ name: "", role: "", email: "" });
     }
+    // Blur current focus to prevent ARIA hidden warnings when modal opens
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setOpen(true);
   };
 
@@ -86,13 +96,13 @@ const Team = () => {
           `https://team-management-production-22c4.up.railway.app/members/${editing}`,
           formData,
         );
-        showNotification("Expert profile updated!");
+        showNotification("Member profile updated!");
       } else {
         await axios.post(
           "https://team-management-production-22c4.up.railway.app/members",
           formData,
         );
-        showNotification("New expert added to the roster!");
+        showNotification("New member added to the roster!");
       }
       fetchMembers();
       handleClose();
@@ -103,12 +113,12 @@ const Team = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Remove this expert from the roster?")) {
+    if (window.confirm("Remove this member from the roster?")) {
       try {
         await axios.delete(
           `https://team-management-production-22c4.up.railway.app/members/${id}`,
         );
-        showNotification("Expert removed", "error");
+        showNotification("Member removed", "error");
         fetchMembers();
       } catch (err) {
         console.error(err);
@@ -119,7 +129,7 @@ const Team = () => {
   const columns = [
     {
       field: "name",
-      headerName: "Expert Name",
+      headerName: "Name",
       minWidth: 200,
       flex: 1,
       renderCell: (params) => (
@@ -133,7 +143,7 @@ const Team = () => {
     },
     { 
       field: "role", 
-      headerName: "Strategic Role", 
+      headerName: "Role", 
       minWidth: 150,
       flex: 1,
       renderCell: (params) => (
@@ -159,7 +169,7 @@ const Team = () => {
               <Edit fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Remove Expert">
+          <Tooltip title="Remove Member">
             <IconButton
               onClick={() => handleDelete(params.row._id)}
               size="small"
@@ -172,25 +182,88 @@ const Team = () => {
       ),
     },
   ];
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const MobileMemberCard = ({ member }) => (
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: 4,
+        bgcolor: "#1e293b",
+        border: "1px solid rgba(255,255,255,0.05)",
+        overflow: "hidden",
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+          <Avatar 
+            src={member.avatar} 
+            sx={{ width: 48, height: 48, mr: 2, bgcolor: "primary.main", fontWeight: 800 }}
+          >
+            {member.name?.[0]}
+          </Avatar>
+          <Box>
+            <Typography variant="h6" fontWeight={800}>{member.name}</Typography>
+            <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 700 }}>{member.role}</Typography>
+          </Box>
+        </Box>
+        
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", display: "block", mb: 0.5 }}>
+            Contact
+          </Typography>
+          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)" }}>{member.email}</Typography>
+        </Box>
+
+        <Divider sx={{ mb: 2, opacity: 0.05 }} />
+
+        <Stack direction="row" spacing={2}>
+          <Button
+            fullWidth
+            variant="outlined"
+            size="small"
+            startIcon={<Edit />}
+            onClick={() => handleOpen(member)}
+            sx={{ borderRadius: 2, fontWeight: 700 }}
+          >
+            Edit
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            size="small"
+            color="error"
+            startIcon={<Delete />}
+            onClick={() => handleDelete(member._id)}
+            sx={{ borderRadius: 2, fontWeight: 700, borderColor: "rgba(239, 68, 68, 0.2)" }}
+          >
+            Remove
+          </Button>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <Box ref={containerRef} sx={{ mt: 2 }}>
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap",
+          flexDirection: isMobile ? "column" : "row",
           justifyContent: "space-between",
-          alignItems: "center",
-          mb: 6,
+          alignItems: isMobile ? "flex-start" : "center",
+          mb: { xs: 4, md: 6 },
           gap: 2,
         }}
       >
         <Box>
-          <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-1.5px", mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}>
-            Domain Experts
+          <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-1.5px", mb: 1 }}>
+            Team Management
           </Typography>
           <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)" }}>
-            Managing {members.length} high-impact collaborators
+            Overview of {members.length} team members
           </Typography>
         </Box>
         <Button
@@ -208,60 +281,85 @@ const Team = () => {
             width: { xs: "100%", sm: "auto" }
           }}
         >
-          Add Expert
+          Add Member
         </Button>
       </Box>
 
-      <Paper
-        sx={{
-          height: 650,
-          width: "100%",
-          bgcolor: "#1e293b",
-          borderRadius: 6,
-          overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-        }}
-      >
-        <DataGrid
-          rows={members}
-          getRowId={(row) => row._id}
-          columns={columns}
-          loading={loading}
-          pageSize={10}
-          rowsPerPageOptions={[10, 25, 50]}
-          disableSelectionOnClick
-          rowHeight={70}
+      {isMobile ? (
+        <Box sx={{ pb: 4 }}>
+          {members.length > 0 ? (
+            members.map((member) => (
+              <MobileMemberCard key={member._id} member={member} />
+            ))
+          ) : (
+            <Paper
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 4,
+                bgcolor: "rgba(255,255,255,0.02)",
+                border: "1px dashed rgba(255,255,255,0.1)",
+              }}
+            >
+              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.4)" }}>
+                No team members found.
+              </Typography>
+            </Paper>
+          )}
+        </Box>
+      ) : (
+        <Paper
           sx={{
-            border: "none",
-            color: "rgba(255,255,255,0.8)",
-            "& .MuiDataGrid-columnHeaders": {
-              bgcolor: "rgba(255, 255, 255, 0.02)",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-              color: "rgba(255,255,255,0.4)",
-              fontWeight: 800,
-              textTransform: "uppercase",
-              fontSize: "0.75rem",
-              letterSpacing: "1px",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              bgcolor: "transparent",
-            },
+            height: 650,
+            width: "100%",
+            bgcolor: "#1e293b",
+            borderRadius: 6,
+            overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.05)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
           }}
-        />
-      </Paper>
+        >
+          <DataGrid
+            rows={members}
+            getRowId={(row) => row._id}
+            columns={columns}
+            loading={loading}
+            pageSize={10}
+            rowsPerPageOptions={[10, 25, 50]}
+            disableSelectionOnClick
+            rowHeight={70}
+            sx={{
+              border: "none",
+              color: "rgba(255,255,255,0.8)",
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                color: "rgba(255,255,255,0.4)",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                letterSpacing: "1px",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
+              },
+              "& .MuiDataGrid-footerContainer": {
+                borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                bgcolor: "transparent",
+              },
+            }}
+          />
+        </Paper>
+      )}
 
       <Dialog
         open={open}
         onClose={handleClose}
         fullWidth
         maxWidth="xs"
+        fullScreen={isMobile}
         PaperProps={{
           sx: {
             borderRadius: 6,
@@ -272,12 +370,12 @@ const Team = () => {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <DialogTitle sx={{ p: 4, pb: 2 }}>
+          <DialogTitle sx={{ p: 4, pb: 2 }} component="div">
             <Typography variant="h4" fontWeight={900} sx={{ letterSpacing: "-1px" }}>
-              {editing ? "Refine Profile" : "Onboard Expert"}
+              {editing ? "Edit Member" : "Add Team Member"}
             </Typography>
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mt: 1 }}>
-              Enter the professional parameters for this domain expert.
+              Configure member details and roles.
             </Typography>
           </DialogTitle>
           <DialogContent sx={{ p: 4 }}>
@@ -323,7 +421,7 @@ const Team = () => {
               size="large"
               sx={{ borderRadius: 3, px: 6, fontWeight: 900, boxShadow: "0 10px 20px rgba(99, 102, 241, 0.2)" }}
             >
-              {editing ? "Save Refinements" : "Complete Onboarding"}
+              {editing ? "Save Changes" : "Add Member"}
             </Button>
           </DialogActions>
         </form>

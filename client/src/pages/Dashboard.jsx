@@ -142,11 +142,11 @@ const Dashboard = () => {
             spacing={4}
           >
             <Box>
-              <Typography variant="h2" fontWeight={900} sx={{ letterSpacing: "-2px", color: "white", lineHeight: 1.1, mb: 2, fontSize: { xs: "2.5rem", md: "3.75rem" } }}>
-                Unleash Your <br /> Team's Potential
+              <Typography variant="h2" fontWeight={900} sx={{ letterSpacing: "-2px", color: "white", lineHeight: 1.1, mb: 2 }}>
+                High-Velocity Project <br /> Management
               </Typography>
               <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.8)", mb: 4, maxWidth: 500, fontWeight: 500 }}>
-                Antigravity is the high-velocity engine for modern development teams. Launch, track, and scale your projects.
+                Track progress, manage teams, and scale your operations with the Nexus Pro development suite.
               </Typography>
               <Stack direction="row" spacing={2}>
                 <Button
@@ -184,7 +184,7 @@ const Dashboard = () => {
               </Stack>
             </Box>
             <Box sx={{ display: { xs: "none", lg: "block" } }}>
-              <RocketLaunch sx={{ fontSize: 240, color: "white", opacity: 0.15, transform: "rotate(15deg)" }} />
+              <RocketLaunch sx={{ fontSize: { lg: 200, xl: 240 }, color: "white", opacity: 0.15, transform: "rotate(15deg)" }} />
             </Box>
           </Stack>
         </Box>
@@ -194,7 +194,7 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <Grid container spacing={4}>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
             title="Total Projects"
             count={stats.projects}
@@ -203,18 +203,18 @@ const Dashboard = () => {
             delay={0.1}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
-            title="Domain Experts"
+            title="Active Members"
             count={stats.members}
             icon={<Groups />}
             color="#a855f7"
             delay={0.2}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <StatCard
-            title="Active Sprints"
+            title="In-Progress"
             count={stats.active}
             icon={<RocketLaunch />}
             color="#ec4899"

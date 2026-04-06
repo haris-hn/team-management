@@ -19,22 +19,17 @@ const Login = ({ isRegister = false }) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const location = useLocation();
+  const [success, setSuccess] = useState(location.state?.message || null);
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const formRef = useRef(null);
   const titleRef = useRef(null);
   const fieldsRef = useRef([]);
 
   useEffect(() => {
-    // Check for success message from registration redirect
-    if (location.state?.message) {
-      setSuccess(location.state.message);
-    }
-
     const tl = gsap.timeline();
     tl.fromTo(
       formRef.current,
@@ -137,12 +132,12 @@ const Login = ({ isRegister = false }) => {
               ref={titleRef}
               variant="h3"
               fontWeight={900}
-              sx={{ letterSpacing: "-1.5px", color: "white", mb: 1, fontSize: { xs: "2rem", sm: "3rem" } }}
+              sx={{ letterSpacing: "-1.5px", color: "white", mb: 1 }}
             >
-              {isRegister ? "Join Us" : "Welcome Back"}
+              {isRegister ? "Create Account" : "Sign In"}
             </Typography>
             <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
-              {isRegister ? "Start your journey with Antigravity." : "Sign in to manage your high-velocity projects."}
+              {isRegister ? "Join the Nexus Pro platform." : "Access your secure dashboard."}
             </Typography>
           </Box>
 
@@ -207,14 +202,14 @@ const Login = ({ isRegister = false }) => {
                   mt: 1,
                 }}
               >
-                {isRegister ? "Create Account" : "Access Workspace"}
+                {isRegister ? "Register" : "Sign In"}
               </Button>
             </Stack>
           </form>
 
           <Box sx={{ mt: 5, textAlign: "center" }}>
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
-              {isRegister ? "Already member? " : "New to the platform? "}
+              {isRegister ? "Already have an account? " : "Don't have an account? "}
               <Button
                 variant="text"
                 onClick={() => navigate(isRegister ? "/login" : "/register")}
@@ -227,7 +222,7 @@ const Login = ({ isRegister = false }) => {
                   "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
                 }}
               >
-                {isRegister ? "Log In" : "Register Now"}
+                {isRegister ? "Sign In" : "Sign Up"}
               </Button>
             </Typography>
           </Box>

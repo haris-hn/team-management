@@ -63,7 +63,6 @@ const Login = ({ isRegister = false }) => {
     if (isRegister) {
       const result = await register(name, email, password);
       if (result.success) {
-        // Redirect to login after register as requested
         navigate("/login", {
           state: {
             message: "Registration successful! Please sign in to continue.",
@@ -88,9 +87,11 @@ const Login = ({ isRegister = false }) => {
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+        justifyContent: "center",
+        background: "#0f172a",
         position: "relative",
         overflow: "hidden",
+        p: 2,
       }}
     >
       {/* Animated Background Orbs */}
@@ -99,11 +100,10 @@ const Login = ({ isRegister = false }) => {
           position: "absolute",
           top: "-10%",
           right: "-5%",
-          width: "40vw",
-          height: "40vw",
+          width: { xs: "80vw", md: "40vw" },
+          height: { xs: "80vw", md: "40vw" },
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)",
           filter: "blur(60px)",
         }}
       />
@@ -112,11 +112,10 @@ const Login = ({ isRegister = false }) => {
           position: "absolute",
           bottom: "-10%",
           left: "-5%",
-          width: "30vw",
-          height: "30vw",
+          width: { xs: "70vw", md: "30vw" },
+          height: { xs: "70vw", md: "30vw" },
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(236, 72, 153, 0.05) 0%, transparent 70%)",
           filter: "blur(60px)",
         }}
       />
@@ -126,117 +125,109 @@ const Login = ({ isRegister = false }) => {
           ref={formRef}
           elevation={0}
           sx={{
-            p: 5,
-            borderRadius: 6,
-            bgcolor: "rgba(99, 102, 241, 0.15)",
-            color: "#0f172a",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
-            backdropFilter: "blur(10px)",
+            p: { xs: 4, sm: 6 },
+            borderRadius: 8,
+            bgcolor: "#1e293b",
+            border: "1px solid rgba(255,255,255,0.05)",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
           }}
         >
-          <Typography
-            ref={titleRef}
-            variant="h3"
-            gutterBottom
-            fontWeight={900}
-            sx={{ letterSpacing: "-1px", color: "#000000" }}
-          >
-            {isRegister ? "Create Account" : "Nexus Login"}
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ mb: 4, opacity: 0.8, color: "#000000" }}
-            fontWeight={500}
-          >
-            {isRegister
-              ? "Join the future of project management."
-              : "Enter your workspace credentials."}
-          </Typography>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              ref={titleRef}
+              variant="h3"
+              fontWeight={900}
+              sx={{ letterSpacing: "-1.5px", color: "white", mb: 1, fontSize: { xs: "2rem", sm: "3rem" } }}
+            >
+              {isRegister ? "Join Us" : "Welcome Back"}
+            </Typography>
+            <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
+              {isRegister ? "Start your journey with Antigravity." : "Sign in to manage your high-velocity projects."}
+            </Typography>
+          </Box>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert severity="error" sx={{ mb: 3, borderRadius: 3, fontWeight: 600 }}>
               {error}
             </Alert>
           )}
           {success && (
-            <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert severity="success" sx={{ mb: 3, borderRadius: 3, fontWeight: 600 }}>
               {success}
             </Alert>
           )}
 
           <form onSubmit={handleSubmit}>
-            <Stack spacing={2.5}>
+            <Stack spacing={3}>
               {isRegister && (
                 <TextField
                   inputRef={(el) => (fieldsRef.current[0] = el)}
                   fullWidth
-                  label="Name"
+                  label="Display Name"
                   variant="filled"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  sx={{ bgcolor: "rgba(0,0,0,0.03)", borderRadius: 1 }}
+                  InputProps={{ sx: { borderRadius: 3, bgcolor: "rgba(255,255,255,0.03)" } }}
                 />
               )}
               <TextField
                 inputRef={(el) => (fieldsRef.current[isRegister ? 1 : 0] = el)}
                 fullWidth
-                label="Email"
+                label="Email Address"
                 type="email"
                 variant="filled"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                sx={{ bgcolor: "rgba(0,0,0,0.03)", borderRadius: 1 }}
+                InputProps={{ sx: { borderRadius: 3, bgcolor: "rgba(255,255,255,0.03)" } }}
               />
               <TextField
                 inputRef={(el) => (fieldsRef.current[isRegister ? 2 : 1] = el)}
                 fullWidth
-                label="Password"
+                label="Secure Password"
                 type="password"
                 variant="filled"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                sx={{ bgcolor: "rgba(0,0,0,0.03)", borderRadius: 1 }}
+                InputProps={{ sx: { borderRadius: 3, bgcolor: "rgba(255,255,255,0.03)" } }}
               />
               <Button
-                ref={(el) => (fieldsRef.current[isRegister ? 3 : 2] = el)}
-                fullWidth
                 variant="contained"
                 size="large"
                 type="submit"
                 sx={{
                   py: 2,
-                  fontSize: "1.1rem",
+                  fontSize: "1rem",
+                  fontWeight: 900,
                   borderRadius: 3,
-                  bgcolor: "#0f172a",
-                  "&:hover": { bgcolor: "#334155" },
+                  textTransform: "none",
+                  boxShadow: "0 10px 20px rgba(99, 102, 241, 0.2)",
+                  mt: 1,
                 }}
               >
-                {isRegister ? "Get Started" : "Sign In Now"}
+                {isRegister ? "Create Account" : "Access Workspace"}
               </Button>
             </Stack>
           </form>
 
-          <Box sx={{ mt: 4, textAlign: "center" }}>
-            <Typography variant="body2" sx={{ opacity: 0.8, color: "#000000" }}>
-              {isRegister ? "Already an expert? " : "New here? "}
+          <Box sx={{ mt: 5, textAlign: "center" }}>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
+              {isRegister ? "Already member? " : "New to the platform? "}
               <Button
                 variant="text"
-                onClick={() => {
-                  setSuccess(null);
-                  navigate(isRegister ? "/login" : "/register");
-                }}
+                onClick={() => navigate(isRegister ? "/login" : "/register")}
                 sx={{
-                  color: "#6366f1",
+                  color: "primary.main",
                   fontWeight: 800,
                   p: 0,
                   minWidth: "auto",
-                  ml: 0.5,
+                  textTransform: "none",
+                  "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
                 }}
               >
-                {isRegister ? "Sign In" : "Create Account"}
+                {isRegister ? "Log In" : "Register Now"}
               </Button>
             </Typography>
           </Box>

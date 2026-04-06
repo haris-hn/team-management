@@ -13,8 +13,10 @@ import {
   IconButton,
   Alert,
   Snackbar,
+  Paper,
+  Divider,
 } from "@mui/material";
-import { Add, Delete, Edit, GroupAdd } from "@mui/icons-material";
+import { Add, Delete, Edit, GroupAdd, PersonAdd } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { gsap } from "gsap";
 import axios from "axios";
@@ -32,7 +34,6 @@ const Team = () => {
   const [loading, setLoading] = useState(true);
 
   const containerRef = useRef(null);
-  const snackRef = useRef(null);
 
   useEffect(() => {
     fetchMembers();
@@ -58,17 +59,11 @@ const Team = () => {
 
   const showNotification = (message, color = "success") => {
     setSnackbar({ open: true, message, color });
-    const tl = gsap.timeline();
-    tl.fromTo(
-      ".MuiSnackbar-root",
-      { x: 50, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.5, ease: "back.out" },
-    );
   };
 
   const handleOpen = (member = null) => {
     if (member) {
-      setEditing(member._id); // Use _id for MongoDB
+      setEditing(member._id);
       setFormData({
         name: member.name,
         role: member.role,
@@ -91,28 +86,29 @@ const Team = () => {
           `https://team-management-production-22c4.up.railway.app/members/${editing}`,
           formData,
         );
-        showNotification("Member updated successfully!");
+        showNotification("Expert profile updated!");
       } else {
         await axios.post(
           "https://team-management-production-22c4.up.railway.app/members",
           formData,
         );
-        showNotification("Member added successfully!");
+        showNotification("New expert added to the roster!");
       }
       fetchMembers();
       handleClose();
     } catch (err) {
       console.error(err);
+      showNotification("Operation failed", "error");
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to remove this member?")) {
+    if (window.confirm("Remove this expert from the roster?")) {
       try {
         await axios.delete(
           `https://team-management-production-22c4.up.railway.app/members/${id}`,
         );
-        showNotification("Member removed", "error");
+        showNotification("Expert removed", "error");
         fetchMembers();
       } catch (err) {
         console.error(err);
@@ -123,152 +119,211 @@ const Team = () => {
   const columns = [
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Expert Name",
+      minWidth: 200,
       flex: 1,
       renderCell: (params) => (
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Avatar src={params.row.avatar} sx={{ width: 32, height: 32 }}>
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ height: "100%" }}>
+          <Avatar src={params.row.avatar} sx={{ width: 32, height: 32, bgcolor: "primary.main", fontWeight: 800, fontSize: "0.8rem" }}>
             {params.value?.[0]}
           </Avatar>
-          <Typography fontWeight={600}>{params.value}</Typography>
+          <Typography fontWeight={700}>{params.value}</Typography>
         </Stack>
       ),
     },
-    { field: "role", headerName: "Role", flex: 1 },
-    { field: "email", headerName: "Email Address", flex: 1.5 },
+    { 
+      field: "role", 
+      headerName: "Strategic Role", 
+      minWidth: 150,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>
+          {params.value}
+        </Typography>
+      )
+    },
+    { field: "email", headerName: "Contact", minWidth: 200, flex: 1 },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: "Operations",
       width: 120,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <IconButton
-            onClick={() => handleOpen(params.row)}
-            color="primary"
-            size="small"
-          >
-            <Edit />
-          </IconButton>
-          <IconButton
-            onClick={() => handleDelete(params.row._id)}
-            color="error"
-            size="small"
-          >
-            <Delete />
-          </IconButton>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ height: "100%" }}>
+          <Tooltip title="Edit Profile">
+            <IconButton
+              onClick={() => handleOpen(params.row)}
+              size="small"
+              sx={{ color: "primary.main", bgcolor: "rgba(99, 102, 241, 0.1)" }}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Remove Expert">
+            <IconButton
+              onClick={() => handleDelete(params.row._id)}
+              size="small"
+              sx={{ color: "error.main", bgcolor: "rgba(239, 68, 68, 0.1)" }}
+            >
+              <Delete fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Stack>
       ),
     },
   ];
 
   return (
-    <Box ref={containerRef} sx={{ p: 1 }}>
+    <Box ref={containerRef} sx={{ mt: 2 }}>
       <Box
         sx={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 4,
+          mb: 6,
+          gap: 2,
         }}
       >
-        <Typography variant="h4" fontWeight={800} color="primary">
-          Team Directory
-        </Typography>
+        <Box>
+          <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: "-1.5px", mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}>
+            Domain Experts
+          </Typography>
+          <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.5)" }}>
+            Managing {members.length} high-impact collaborators
+          </Typography>
+        </Box>
         <Button
           variant="contained"
-          color="secondary"
-          startIcon={<GroupAdd />}
+          startIcon={<PersonAdd />}
           onClick={() => handleOpen()}
-          sx={{ boxShadow: 3 }}
+          sx={{
+            borderRadius: 4,
+            px: 4,
+            py: 1.5,
+            fontWeight: 900,
+            textTransform: "none",
+            fontSize: "1rem",
+            boxShadow: "0 10px 20px rgba(99, 102, 241, 0.2)",
+            width: { xs: "100%", sm: "auto" }
+          }}
         >
-          Add Member
+          Add Expert
         </Button>
       </Box>
 
-      <Box
+      <Paper
         sx={{
-          height: 600,
+          height: 650,
           width: "100%",
-          bgcolor: "background.paper",
-          borderRadius: 4,
+          bgcolor: "#1e293b",
+          borderRadius: 6,
           overflow: "hidden",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
         }}
       >
         <DataGrid
           rows={members}
-          getRowId={(row) => row._id} // Tell DataGrid to use _id
+          getRowId={(row) => row._id}
           columns={columns}
           loading={loading}
           pageSize={10}
           rowsPerPageOptions={[10, 25, 50]}
           disableSelectionOnClick
+          rowHeight={70}
           sx={{
             border: "none",
+            color: "rgba(255,255,255,0.8)",
             "& .MuiDataGrid-columnHeaders": {
-              bgcolor: "rgba(255, 255, 255, 0.03)",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+              bgcolor: "rgba(255, 255, 255, 0.02)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+              color: "rgba(255,255,255,0.4)",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              fontSize: "0.75rem",
+              letterSpacing: "1px",
             },
             "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
             },
             "& .MuiDataGrid-footerContainer": {
-              borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+              borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+            },
+            "& .MuiDataGrid-virtualScroller": {
+              bgcolor: "transparent",
             },
           }}
         />
-      </Box>
+      </Paper>
 
       <Dialog
         open={open}
         onClose={handleClose}
         fullWidth
         maxWidth="xs"
-        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+        PaperProps={{
+          sx: {
+            borderRadius: 6,
+            bgcolor: "#0f172a",
+            backgroundImage: "none",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }
+        }}
       >
         <form onSubmit={handleSubmit}>
-          <DialogTitle fontWeight={800} sx={{ color: "primary.main" }}>
-            {editing ? "Edit Member" : "New Team Member"}
+          <DialogTitle sx={{ p: 4, pb: 2 }}>
+            <Typography variant="h4" fontWeight={900} sx={{ letterSpacing: "-1px" }}>
+              {editing ? "Refine Profile" : "Onboard Expert"}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mt: 1 }}>
+              Enter the professional parameters for this domain expert.
+            </Typography>
           </DialogTitle>
-          <DialogContent dividers>
-            <Stack spacing={3} sx={{ mt: 1 }}>
+          <DialogContent sx={{ p: 4 }}>
+            <Stack spacing={4} sx={{ mt: 1 }}>
               <TextField
+                autoFocus
                 fullWidth
-                label="Full Name"
+                label="Full Professional Name"
+                variant="filled"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+                InputProps={{ sx: { borderRadius: 2, bgcolor: "rgba(255,255,255,0.03)" } }}
               />
               <TextField
                 fullWidth
-                label="Role / Title"
+                label="Strategic Role / Title"
+                variant="filled"
                 value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 required
+                InputProps={{ sx: { borderRadius: 2, bgcolor: "rgba(255,255,255,0.03)" } }}
               />
               <TextField
                 fullWidth
-                label="Email"
+                label="Communication Email"
                 type="email"
+                variant="filled"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
+                InputProps={{ sx: { borderRadius: 2, bgcolor: "rgba(255,255,255,0.03)" } }}
               />
             </Stack>
           </DialogContent>
-          <DialogActions sx={{ p: 3 }}>
-            <Button onClick={handleClose} color="inherit">
-              Cancel
+          <DialogActions sx={{ p: 4, pt: 0 }}>
+            <Button onClick={handleClose} sx={{ color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>
+              Discard
             </Button>
-            <Button variant="contained" color="secondary" type="submit">
-              {editing ? "Save Changes" : "Add Member"}
+            <Button
+              variant="contained"
+              type="submit"
+              size="large"
+              sx={{ borderRadius: 3, px: 6, fontWeight: 900, boxShadow: "0 10px 20px rgba(99, 102, 241, 0.2)" }}
+            >
+              {editing ? "Save Refinements" : "Complete Onboarding"}
             </Button>
           </DialogActions>
         </form>
@@ -280,7 +335,11 @@ const Team = () => {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert severity={snackbar.color} sx={{ borderRadius: 2, boxShadow: 6 }}>
+        <Alert 
+          severity={snackbar.color} 
+          variant="filled"
+          sx={{ borderRadius: 3, fontWeight: 700, boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

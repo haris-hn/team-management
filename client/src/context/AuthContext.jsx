@@ -8,8 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
 
-  const API_URL =
-    "https://team-management-production-22c4.up.railway.app//auth";
+  const API_URL = "https://team-management-production-22c4.up.railway.app/auth";
 
   useEffect(() => {
     if (token) {

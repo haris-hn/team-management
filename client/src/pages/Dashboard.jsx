@@ -128,10 +128,10 @@ const Dashboard = () => {
       try {
         const [projRes, memRes] = await Promise.all([
           axios.get(
-            "https://team-management-production-22c4.up.railway.app//projects",
+            "https://team-management-production-22c4.up.railway.app/projects",
           ),
           axios.get(
-            "https://team-management-production-22c4.up.railway.app//members",
+            "https://team-management-production-22c4.up.railway.app/members",
           ),
         ]);
 

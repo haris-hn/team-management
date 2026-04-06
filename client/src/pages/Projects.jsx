@@ -208,10 +208,10 @@ const Projects = () => {
     try {
       const [projRes, memRes] = await Promise.all([
         axios.get(
-          "https://team-management-production-22c4.up.railway.app//projects",
+          "https://team-management-production-22c4.up.railway.app/projects",
         ),
         axios.get(
-          "https://team-management-production-22c4.up.railway.app//members",
+          "https://team-management-production-22c4.up.railway.app/members",
         ),
       ]);
       setProjects(projRes.data);
@@ -253,12 +253,12 @@ const Projects = () => {
     try {
       if (editing) {
         await axios.put(
-          `https://team-management-production-22c4.up.railway.app//projects/${editing}`,
+          `https://team-management-production-22c4.up.railway.app/projects/${editing}`,
           formData,
         );
       } else {
         await axios.post(
-          "https://team-management-production-22c4.up.railway.app//projects",
+          "https://team-management-production-22c4.up.railway.app/projects",
           formData,
         );
       }
@@ -273,7 +273,7 @@ const Projects = () => {
     if (window.confirm("Delete this project? This action cannot be undone.")) {
       try {
         await axios.delete(
-          `https://team-management-production-22c4.up.railway.app//projects/${id}`,
+          `https://team-management-production-22c4.up.railway.app/projects/${id}`,
         );
         fetchData();
       } catch (err) {

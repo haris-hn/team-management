@@ -46,7 +46,7 @@ const Team = () => {
   const fetchMembers = async () => {
     try {
       const res = await axios.get(
-        "https://team-management-production-22c4.up.railway.app//members",
+        "https://team-management-production-22c4.up.railway.app/members",
       );
       setMembers(res.data);
     } catch (err) {
@@ -88,13 +88,13 @@ const Team = () => {
     try {
       if (editing) {
         await axios.put(
-          `https://team-management-production-22c4.up.railway.app//members/${editing}`,
+          `https://team-management-production-22c4.up.railway.app/members/${editing}`,
           formData,
         );
         showNotification("Member updated successfully!");
       } else {
         await axios.post(
-          "https://team-management-production-22c4.up.railway.app//members",
+          "https://team-management-production-22c4.up.railway.app/members",
           formData,
         );
         showNotification("Member added successfully!");
@@ -110,7 +110,7 @@ const Team = () => {
     if (window.confirm("Are you sure you want to remove this member?")) {
       try {
         await axios.delete(
-          `https://team-management-production-22c4.up.railway.app//members/${id}`,
+          `https://team-management-production-22c4.up.railway.app/members/${id}`,
         );
         showNotification("Member removed", "error");
         fetchMembers();

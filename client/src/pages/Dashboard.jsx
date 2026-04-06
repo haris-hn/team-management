@@ -17,17 +17,19 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
-import axios from "axios";
+import apiClient from "../api/client";
 
 const StatCard = ({ title, count, icon, color, delay }) => {
   const cardRef = React.useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(
-      cardRef.current,
-      { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: 0.5, delay, ease: "back.out(1.7)" },
-    );
+    if (cardRef.current) {
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.5, delay, ease: "back.out(1.7)" },
+      );
+    }
   }, [delay]);
 
   return (
@@ -100,25 +102,18 @@ const Dashboard = () => {
     active: 0,
   });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
   const fetchStats = async () => {
     try {
-      const [projRes, memRes] = await Promise.all([
-        axios.get("https://team-management-production-22c4.up.railway.app/projects"),
-        axios.get("https://team-management-production-22c4.up.railway.app/members"),
-      ]);
-      setStats({
-        projects: projRes.data.length,
-        members: memRes.data.length,
-        active: projRes.data.filter((p) => p.status === "active").length,
-      });
+      const res = await apiClient.get("/stats");
+      setStats(res.data);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   return (
     <Box>

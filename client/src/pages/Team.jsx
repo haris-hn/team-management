@@ -18,14 +18,13 @@ import {
   Tooltip,
   useTheme,
   useMediaQuery,
-  Grid,
   Card,
   CardContent,
 } from "@mui/material";
-import { Add, Delete, Edit, GroupAdd, PersonAdd } from "@mui/icons-material";
+import { Delete, Edit, PersonAdd } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { gsap } from "gsap";
-import axios from "axios";
+import apiClient from "../api/client";
 
 const Team = () => {
   const [members, setMembers] = useState([]);
@@ -40,21 +39,24 @@ const Team = () => {
   const [loading, setLoading] = useState(true);
 
   const containerRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchMembers();
-    gsap.fromTo(
-      containerRef.current,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-    );
+    if (containerRef.current) {
+      gsap.fromTo(
+        containerRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+      );
+    }
   }, []);
 
   const fetchMembers = async () => {
     try {
-      const res = await axios.get(
-        "https://team-management-production-22c4.up.railway.app/members",
-      );
+      setLoading(true);
+      const res = await apiClient.get("/members");
       setMembers(res.data);
     } catch (err) {
       console.error(err);
@@ -92,16 +94,10 @@ const Team = () => {
     e.preventDefault();
     try {
       if (editing) {
-        await axios.put(
-          `https://team-management-production-22c4.up.railway.app/members/${editing}`,
-          formData,
-        );
+        await apiClient.put(`/members/${editing}`, formData);
         showNotification("Member profile updated!");
       } else {
-        await axios.post(
-          "https://team-management-production-22c4.up.railway.app/members",
-          formData,
-        );
+        await apiClient.post("/members", formData);
         showNotification("New member added to the roster!");
       }
       fetchMembers();
@@ -115,9 +111,7 @@ const Team = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Remove this member from the roster?")) {
       try {
-        await axios.delete(
-          `https://team-management-production-22c4.up.railway.app/members/${id}`,
-        );
+        await apiClient.delete(`/members/${id}`);
         showNotification("Member removed", "error");
         fetchMembers();
       } catch (err) {
@@ -182,9 +176,6 @@ const Team = () => {
       ),
     },
   ];
-  
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const MobileMemberCard = ({ member }) => (
     <Card

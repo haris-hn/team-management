@@ -28,10 +28,10 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
-import { Add, Edit, Delete, RocketLaunch, GroupAdd } from "@mui/icons-material";
 import { gsap } from "gsap";
-import axios from "axios";
+import apiClient from "../api/client";
 import { useLocation } from "react-router-dom";
+import { Delete, Edit } from "@mui/icons-material";
 
 const ProjectCard = ({ project, onEdit, onDelete, index, allMembers }) => {
   const cardRef = useRef(null);
@@ -205,8 +205,8 @@ const Projects = () => {
   const fetchData = async () => {
     try {
       const [projRes, memRes] = await Promise.all([
-        axios.get("https://team-management-production-22c4.up.railway.app/projects"),
-        axios.get("https://team-management-production-22c4.up.railway.app/members"),
+        apiClient.get("/projects"),
+        apiClient.get("/members"),
       ]);
       setProjects(projRes.data);
       setMembers(memRes.data);
@@ -250,9 +250,9 @@ const Projects = () => {
     e.preventDefault();
     try {
       if (editing) {
-        await axios.put(`https://team-management-production-22c4.up.railway.app/projects/${editing}`, formData);
+        await apiClient.put(`/projects/${editing}`, formData);
       } else {
-        await axios.post("https://team-management-production-22c4.up.railway.app/projects", formData);
+        await apiClient.post("/projects", formData);
       }
       fetchData();
       handleClose();
@@ -264,7 +264,7 @@ const Projects = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this project? This action cannot be undone.")) {
       try {
-        await axios.delete(`https://team-management-production-22c4.up.railway.app/projects/${id}`);
+        await apiClient.delete(`/projects/${id}`);
         fetchData();
       } catch (err) {
         console.error(err);

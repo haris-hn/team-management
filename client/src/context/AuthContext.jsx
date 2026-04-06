@@ -1,32 +1,27 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import apiClient from "../api/client";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "https://team-management-production-22c4.up.railway.app/auth";
+  // Authentication uses the auth-specific base
+  const AUTH_API = "/auth";
 
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-    } else {
-      delete axios.defaults.headers.common["Authorization"];
-      setUser(null);
-    }
+    // Sync loading state - token and user are already initialized from localStorage
     setLoading(false);
-  }, [token]);
+  }, []);
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/login`, { email, password });
+      const res = await apiClient.post(`${AUTH_API}/login`, { email, password });
       setToken(res.data.token);
       setUser(res.data.user);
       localStorage.setItem("token", res.data.token);
@@ -42,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/register`, {
+      const res = await apiClient.post(`${AUTH_API}/register`, {
         name,
         email,
         password,
@@ -67,10 +62,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  const value = useMemo(() => ({
+    user, token, loading, login, register, logout
+  }), [user, token, loading]);
+
   return (
-    <AuthContext.Provider
-      value={{ user, token, loading, login, register, logout }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

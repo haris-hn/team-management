@@ -5,6 +5,7 @@ const connectDB = require('./db');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 const memberRoutes = require('./routes/members');
+const statsRoutes = require('./routes/stats');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/projects', projectRoutes);
 app.use('/members', memberRoutes);
+app.use('/stats', statsRoutes);
 
 app.get('/', (req, res) => {
   res.send('Project Management API with MongoDB is running...');
